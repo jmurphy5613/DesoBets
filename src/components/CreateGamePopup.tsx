@@ -15,6 +15,7 @@ import {
     Text,
     Alert,
     AlertIcon,
+    Box,
 } from "@chakra-ui/react";
 import { ReactNode, useState } from "react";
 import Deso from "deso-protocol";
@@ -26,28 +27,79 @@ const CreateGamePopup = ({
 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const [publicKey, setPublicKey] = useState("");
+    const [username, setUsername] = useState("");
     const [game, setGame] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | false>(false);
+
+    const checkIfNameExists = async () => {
+        const deso = new Deso();
+        return await deso.user
+            .getSingleProfile({
+                Username: username,
+            })
+            .then((res) => {
+                return res.Profile.PublicKeyBase58Check;
+            })
+            .catch((e) => {
+                setError(e);
+                return null;
+            });
+    };
+
+    const getGameName = (name: string) => {
+        if (name == "ttt") return "Tic Tac Toe";
+        else if (name == "rps") return "Rock Paper Sissors";
+    };
 
     const handleSubmit = async () => {
-        console.log(publicKey);
+        setLoading(true);
+        setError(false);
+        console.log(username);
         console.log(game);
         console.log(message);
 
         const deso = new Deso();
         console.log(deso.identity.getUserKey());
-
-        const postResponse = await deso.posts
-            .submitPost({
-                UpdaterPublicKeyBase58Check: deso.identity.getUserKey(),
-                BodyObj: {
-                    Body: `Hi @${publicKey} I'm challenging you to a game of ${game}. ${message}`,
-                    VideoURLs: [],
-                    ImageURLs: [],
+        const playerBKey = await checkIfNameExists();
+        if (!playerBKey) {
+            setLoading(false);
+            setError("That user doesn't exist :(");
+            return;
+        }
+        await fetch("/api/createGame", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                playerAKey: deso.identity.getUserKey(),
+                playerBKey,
+                gameState: {
+                    type: game,
+                    board: [],
                 },
-            })
-            .then((res) => console.log(res));
+            }),
+        })
+            .then((res) => res.json())
+            .then(async (data) => {
+                const postResponse = await deso.posts
+                    .submitPost({
+                        UpdaterPublicKeyBase58Check: deso.identity.getUserKey(),
+                        BodyObj: {
+                            Body: `Hi @${username} I'm challenging you to a game of ${getGameName(
+                                game
+                            )}. ${message}
+                            ${window.location.origin}/game/${data.id}`,
+                            VideoURLs: [],
+                            ImageURLs: [],
+                        },
+                    })
+                    .then((res) => console.log(res));
+            });
+        setLoading(false);
+        onClose();
     };
 
     return (
@@ -62,8 +114,10 @@ const CreateGamePopup = ({
                     <ModalBody>
                         <InputGroup marginBottom="1rem">
                             <Input
-                                placeholder="Type in a public key ex: QRY3161.."
-                                onChange={(e) => setPublicKey(e.target.value)}
+                                placeholder="Type in a public DeSo username"
+                                onChange={(e) => {
+                                    setUsername(e.target.value);
+                                }}
                             />
                             <InputLeftElement
                                 children="$"
@@ -85,15 +139,24 @@ const CreateGamePopup = ({
                             marginBottom="1rem"
                             onChange={(e) => setMessage(e.target.value)}
                         />
-                        <Alert status="info">
-                            <AlertIcon />
-                            This will create an on-chain post that is tied to
-                            your account permanently
-                        </Alert>
+                        <Box display="flex" flexDir="column" gap={2}>
+                            <Alert status="info" rounded="md">
+                                <AlertIcon />
+                                This will create an on-chain post that is tied
+                                to your account permanently
+                            </Alert>
+                            {error && (
+                                <Alert status="error" rounded="md">
+                                    <AlertIcon />
+                                    {error}
+                                </Alert>
+                            )}
+                        </Box>
                     </ModalBody>
 
                     <ModalFooter display="flex">
                         <Button
+                            isLoading={loading}
                             colorScheme="blue"
                             mr={3}
                             onClick={() => handleSubmit()}

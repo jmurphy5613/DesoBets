@@ -13,30 +13,39 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             });
             return;
         }
-        const [, publicKey] = authorization.split(" ");
-        if (!publicKey) {
+        const [, publicKey, gameID] = authorization.split(" ");
+        if (!publicKey || !gameID) {
             res.status(400).json({
-                error: "Missing publicKey"
+                error: "Missing publicKey or gameID"
             });
             return;
         }
-        const games = await prisma.games.findMany({
+        const game = await prisma.games.findFirst({
             where: {
-                OR: [
+                AND: [
                     {
-                        player_a_key: {
-                            equals: publicKey
+                        id: {
+                            equals: parseInt(gameID)
                         }
                     },
                     {
-                        player_b_key: {
-                            equals: publicKey
-                        }
+                        OR: [
+                            {
+                                player_a_key: {
+                                    equals: publicKey
+                                }
+                            },
+                            {
+                                player_b_key: {
+                                    equals: publicKey
+                                }
+                            }
+                        ]
                     }
                 ]
             }
-        })
-        res.status(200).json(games);
+        });
+        res.status(200).json(game);
     }
     else {
         res.status(405).json({

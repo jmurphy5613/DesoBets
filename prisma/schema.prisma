@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model games {
+  id            BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+  player_a_key  String   @db.Text
+  player_b_key  String   @db.Text
+  player_a_move Boolean?
+  gameState     Json
+  is_playing    Boolean?
+}

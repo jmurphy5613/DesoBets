@@ -15,12 +15,12 @@ const Winning: React.FC<WinningProps> = ({ gameState, opponentName, game }) => {
     const [sentMessage, setSentMessage] = useState(false);
 
     useEffect(() => {
-        if (game && game.is_playing === false) setSentMessage(false);
+        if (game && game.winner) setSentMessage(false);
         else setSentMessage(true);
     }, [game]);
 
     const sendWinningMessage = async () => {
-        if (game.is_playing) {
+        if (!game.winner) {
             await new Deso().posts.submitPost({
                 UpdaterPublicKeyBase58Check: new Deso().identity.getUserKey(),
                 BodyObj: {

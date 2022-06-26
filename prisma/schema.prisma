@@ -13,7 +13,7 @@ model games {
   player_b_key    String   @db.Text
   player_a_move   Boolean?
   gameState       Json
-  is_playing      Boolean?
+  winner          String?  @db.Text
   player_a_name   String?  @db.Text
   player_b_name   String?  @db.Text
   player_a_number String?  @db.Text

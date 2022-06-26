@@ -96,7 +96,7 @@ const App = () => {
                                         <Text>Click on a game to view it!</Text>
                                         <GamesGrid
                                             games={games.filter(
-                                                (game) => game.is_playing
+                                                (game) => !game.winner
                                             )}
                                         />
                                     </AccordionPanel>
@@ -117,7 +117,7 @@ const App = () => {
                                     <AccordionPanel>
                                         <GamesGrid
                                             games={games.filter(
-                                                (game) => !game.is_playing
+                                                (game) => game.winner
                                             )}
                                         />
                                     </AccordionPanel>

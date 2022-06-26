@@ -3,7 +3,7 @@ export interface Game {
     player_a_key: string;
     player_b_key: string;
     gameState: TicTacToeGameState;
-    is_playing: boolean;
+    winner: string;
     player_a_move: boolean;
     player_a_name: string;
     player_b_name: string;

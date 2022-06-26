@@ -58,7 +58,7 @@ const GamesGrid: React.FC<GamesGridProps> = ({ games }: { games: Game[] }) => {
                     _hover={{ cursor: "pointer" }}
                 >
                     <Container height="10%" paddingTop="0.5rem">
-                        {game.is_playing ? (
+                        {!game.winner ? (
                             <Text>In Progress</Text>
                         ) : (
                             <Text>Completed</Text>

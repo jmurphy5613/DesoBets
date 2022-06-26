@@ -16,6 +16,11 @@ import {
     Alert,
     AlertIcon,
     Box,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
 } from "@chakra-ui/react";
 import { ReactNode, useState } from "react";
 import Deso from "deso-protocol";
@@ -30,6 +35,7 @@ const CreateGamePopup = ({
     const [username, setUsername] = useState("");
     const [game, setGame] = useState("");
     const [message, setMessage] = useState("");
+    const [desoAmount, setDesoAmount] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | false>(false);
 
@@ -156,6 +162,18 @@ const CreateGamePopup = ({
                             marginBottom="1rem"
                             onChange={(e) => setMessage(e.target.value)}
                         />
+                        <NumberInput
+                            defaultValue={0}
+                            precision={3}
+                            step={0.001}
+                            marginBottom="1rem"
+                        >
+                            <NumberInputField />
+                            <NumberInputStepper>
+                                <NumberIncrementStepper />
+                                <NumberDecrementStepper />
+                            </NumberInputStepper>
+                        </NumberInput>
                         <Box display="flex" flexDir="column" gap={2}>
                             <Alert status="info" rounded="md">
                                 <AlertIcon />

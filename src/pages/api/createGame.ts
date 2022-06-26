@@ -32,7 +32,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 player_a_key: playerAKey,
                 player_b_key: playerBKey,
                 gameState: gameState,
-                is_playing: true,
                 player_a_move: false,
                 player_a_name: playerAName,
                 player_b_name: playerBName,

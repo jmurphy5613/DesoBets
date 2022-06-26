@@ -57,7 +57,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
             game.gameState['turn'] = game.gameState['turn'] + 1;
         }
-        if (endGame) game.is_playing = false;
+        if (endGame) game.winner = playerKey;
 
         game.gameState['board'] = board;
         await prisma.games.update({

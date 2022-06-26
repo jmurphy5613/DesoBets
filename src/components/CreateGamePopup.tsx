@@ -56,18 +56,33 @@ const CreateGamePopup = ({
     const handleSubmit = async () => {
         setLoading(true);
         setError(false);
-        console.log(username);
-        console.log(game);
-        console.log(message);
 
         const deso = new Deso();
-        console.log(deso.identity.getUserKey());
         const playerBKey = await checkIfNameExists();
+        const playerAName = await deso.user
+            .getSingleProfile({
+                PublicKeyBase58Check: deso.identity.getUserKey(),
+            })
+            .then((user) => user.Profile.Username);
         if (!playerBKey) {
             setLoading(false);
             setError("That user doesn't exist :(");
             return;
         }
+        const playerAJWT = await deso.identity.getJwt();
+        const playerANumber = await fetch(
+            "https://node.deso.org/api/v0/get-user-global-metadata",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    UserPublicKeyBase58Check: deso.identity.getUserKey(),
+                    JWT: playerAJWT,
+                }),
+            }
+        ).then((res) => res.json());
         await fetch("/api/createGame", {
             method: "POST",
             headers: {
@@ -76,10 +91,10 @@ const CreateGamePopup = ({
             body: JSON.stringify({
                 playerAKey: deso.identity.getUserKey(),
                 playerBKey,
-                gameState: {
-                    type: game,
-                    board: [],
-                },
+                gameType: game,
+                playerAName,
+                playerBName: username,
+                playerANumber: playerANumber.PhoneNumber,
             }),
         })
             .then((res) => res.json())
@@ -96,7 +111,10 @@ const CreateGamePopup = ({
                             ImageURLs: [],
                         },
                     })
-                    .then((res) => console.log(res));
+                    .then(
+                        (res) =>
+                            (location.href = `http://localhost:3000/game/${data.id}`)
+                    );
             });
         setLoading(false);
         onClose();
@@ -132,7 +150,6 @@ const CreateGamePopup = ({
                             onChange={(e) => setGame(e.target.value)}
                         >
                             <option value="ttt">TicTacToe</option>
-                            <option value="rps">Rock Paper Sissors</option>
                         </Select>
                         <Input
                             placeholder="Type in a custom message (shown on profile)"

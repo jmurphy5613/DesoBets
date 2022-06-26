@@ -39,6 +39,14 @@ const App = () => {
                 setGames(data);
                 console.log(data);
             });
+
+        new Deso().posts
+            .getPostsForPublicKey({
+                Username: "Neesh774",
+                NumToFetch: 3,
+                MediaRequired: false,
+            })
+            .then((res) => console.log(res));
     }, []);
 
     return (
@@ -51,17 +59,7 @@ const App = () => {
                 width="100%"
                 paddingX={8}
             >
-                <Heading>
-                    Welcome to{" "}
-                    <Text
-                        as="span"
-                        bgGradient="linear(to-r, #de69da, #b91ce5)"
-                        bgClip="text"
-                        fontWeight="extrabold"
-                    >
-                        Deso Bets!
-                    </Text>
-                </Heading>
+                <Heading>Welcome,</Heading>
                 <Text>
                     Create a new game, or check out one of your current games
                     below.
@@ -95,6 +93,7 @@ const App = () => {
                                         </AccordionButton>
                                     </Heading>
                                     <AccordionPanel>
+                                        <Text>Click on a game to view it!</Text>
                                         <GamesGrid
                                             games={games.filter(
                                                 (game) => game.is_playing
@@ -127,7 +126,10 @@ const App = () => {
                             <Box justifyContent="center" display="flex">
                                 <CreateGamePopup
                                     target={(onOpen) => (
-                                        <Button onClick={onOpen}>
+                                        <Button
+                                            onClick={onOpen}
+                                            marginBottom="2rem"
+                                        >
                                             Create Game
                                         </Button>
                                     )}

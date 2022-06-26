@@ -2,54 +2,133 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Deso from "deso-protocol";
 import { PrismaClient } from "@prisma/client";
+import { Box, Spinner } from "@chakra-ui/react";
+import { Game } from "../../types";
+import { TicTacToe } from "../../components/TicTacToe/TicTacToe";
+import NavBar from "../../components/NavBar";
 
 export default function GamePage() {
     const router = useRouter();
-    const [game, setGame] = useState(null);
-
-    useEffect(() => {
-        if (!router.query.gameId) {
-            return console.log("invalid id");
-        }
+    const [game, setGame] = useState<Game>(null);
+    const [loading, setLoading] = useState(true);
+    const updateGame = async (key: string) => {
         fetch("/api/getSingleGame", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${new Deso().identity.getUserKey()} ${router.query.gameId.toString()}`,
+                Authorization: `Bearer ${key} ${router.query.gameId.toString()}`,
             },
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 setGame(data);
+                setLoading(false);
             });
-    }, []);
-}
-
-export async function getStaticPaths() {
-    const prisma = new PrismaClient();
-    const games = await prisma.games.findMany();
-    const paths = games.map((game) => ({
-        params: {
-            gameId: game.id.toString(),
-        },
-    }));
-    return {
-        paths,
-        fallback: false,
     };
-}
+    useEffect(() => {
+        if (!router.query.gameId) {
+            return console.log("invalid id");
+        }
+        const userKey = new Deso().identity.getUserKey();
 
-export async function getStaticProps(context) {
-    const prisma = new PrismaClient();
-    const game = await prisma.games.findFirst({
-        where: {
-            id: parseInt(context.params.gameId),
-        },
-    });
-    return {
-        props: {
-            game,
-        },
+        if (!userKey) {
+            router.push({
+                pathname: "/",
+                query: {
+                    redirectTo: router.pathname,
+                    ...router.query,
+                },
+            });
+        } else {
+            updateGame(new Deso().identity.getUserKey());
+        }
+    }, [router]);
+
+    useEffect(() => {
+        if (game && !isLoggedUsersTurn()) {
+            setTimeout(() => {
+                console.log("Updating game");
+                updateGame(new Deso().identity.getUserKey());
+            }, 1000);
+        }
+        if (game) {
+            updatePhoneNumber();
+        }
+    }, [game]);
+
+    const isLoggedUsersTurn = () => {
+        if (new Deso().identity.getUserKey() == game.player_a_key) {
+            return game.player_a_move;
+        } else {
+            return !game.player_a_move;
+        }
     };
+
+    const getOpponentName = () => {
+        if (new Deso().identity.getUserKey() == game.player_a_key) {
+            return game.player_b_name;
+        } else {
+            return game.player_a_name;
+        }
+    };
+
+    const updatePhoneNumber = async () => {
+        // check if the current player is player b and they don't have a phone number
+        const deso = new Deso();
+        if (
+            deso.identity.getUserKey() == game.player_b_key &&
+            !game.player_b_number
+        ) {
+            const playerBJWT = await deso.identity.getJwt();
+            const playerBNumber = await fetch(
+                "https://node.deso.org/api/v0/get-user-global-metadata",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        UserPublicKeyBase58Check: deso.identity.getUserKey(),
+                        JWT: playerBJWT,
+                    }),
+                }
+            ).then((res) => res.json());
+            if (playerBNumber) {
+                await fetch("/api/updateBNumber", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${new Deso().identity.getUserKey()} ${
+                            game.id
+                        }`,
+                    },
+                    body: JSON.stringify({
+                        playerBNumber: playerBNumber.PhoneNumber,
+                    }),
+                });
+            }
+        }
+    };
+
+    if (loading) {
+        return (
+            <Box>
+                <Spinner />
+            </Box>
+        );
+    }
+
+    switch (game.gameState["type"]) {
+        case "ttt":
+            return (
+                <TicTacToe
+                    gameState={game.gameState}
+                    userTurn={isLoggedUsersTurn()}
+                    opponentName={getOpponentName()}
+                    gameId={game.id}
+                    game={game}
+                    updateGame={updateGame}
+                />
+            );
+    }
 }

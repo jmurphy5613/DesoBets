@@ -8,12 +8,14 @@ datasource db {
 }
 
 model games {
-  id            Int      @id @unique(map: "id")
-  player_a_key  String   @db.Text
-  player_b_key  String   @db.Text
-  player_a_move Boolean?
-  gameState     Json
-  is_playing    Boolean?
-  player_a_name String?  @db.Text
-  player_b_name String?  @db.Text
+  id              Int      @id @unique(map: "id") @default(autoincrement())
+  player_a_key    String   @db.Text
+  player_b_key    String   @db.Text
+  player_a_move   Boolean?
+  gameState       Json
+  is_playing      Boolean?
+  player_a_name   String?  @db.Text
+  player_b_name   String?  @db.Text
+  player_a_number String?  @db.Text
+  player_b_number String?  @db.Text
 }

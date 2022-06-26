@@ -7,22 +7,46 @@ const Index = () => {
     return (
         <Container
             display="flex"
-            width="100%"
-            marginX={4}
+            width="100vw"
             flexDirection="column"
-            marginY={20}
             gap="20px"
+            height="100vh"
+            alignItems="center"
+            justifyContent="center"
+            bgColor="background: rgb(18,19,30);"
+            textAlign="center"
         >
-            <Heading size="3xl">Deso Bets</Heading>
-            <Text size="xl">
-                This is a simple example of a decentralized betting application.
+            <Heading
+                size="3xl"
+                style={{
+                    background:
+                        "linear-gradient(90deg, rgba(0,133,201,1) 0%, rgba(130,63,152,1) 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontFamily: "Inter",
+                    fontWeight: "700",
+                }}
+            >
+                Deso Bets
+            </Heading>
+            <Text fontSize="1.5rem" width="100vw" fontFamily="Inter">
+                The first decentralized betting game running on the Deso
+                Blockchain.
             </Text>
             <Button
                 variant="solid"
-                colorScheme="blue"
+                width="10rem"
                 onClick={async () => {
-                    const response = await new Deso().identity.login();
-                    router.push({ pathname: "/app" });
+                    await new Deso().identity.login();
+                    if (router.query.redirectTo) {
+                        const { redirectTo, ...queries } = router.query;
+                        router.push({
+                            pathname: redirectTo as string,
+                            query: queries,
+                        });
+                    } else {
+                        router.push("/app");
+                    }
                 }}
             >
                 Login

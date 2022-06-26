@@ -84,8 +84,20 @@ export default function NavBar() {
                     />
 
                     <HStack spacing={8} alignItems={"center"}>
-                        <Box>
-                            <Heading size="lg">Deso Bets</Heading>
+                        <Box paddingX={4}>
+                            <Heading
+                                style={{
+                                    background:
+                                        "linear-gradient(90deg, rgba(0,133,201,1) 0%, rgba(130,63,152,1) 100%)",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                    fontFamily: "Inter",
+                                    fontWeight: "700",
+                                }}
+                                size="lg"
+                            >
+                                Deso Bets
+                            </Heading>
                         </Box>
                         <HStack
                             as={"nav"}

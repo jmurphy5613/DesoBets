@@ -1,5 +1,6 @@
 import { Grid, Text, GridItem, Container } from "@chakra-ui/react";
 import { Game } from "../types";
+import { useRouter } from "next/router";
 
 import Deso from "deso-protocol";
 
@@ -30,6 +31,8 @@ const GamesGrid: React.FC<GamesGridProps> = ({ games }: { games: Game[] }) => {
         }
     };
 
+    const router = useRouter();
+
     return (
         <Grid
             templateRows="repeat(2, 1fr)"
@@ -49,15 +52,27 @@ const GamesGrid: React.FC<GamesGridProps> = ({ games }: { games: Game[] }) => {
                     flexDirection="column"
                     fontSize="1.2rem"
                     fontWeight="500"
+                    onClick={() => {
+                        location.href = `http://localhost:3000/game/${game.id}`;
+                    }}
+                    _hover={{ cursor: "pointer" }}
                 >
-                    <Text paddingLeft="1rem" paddingTop="0.5rem">
-                        Game Id: {game.id}
-                    </Text>
+                    <Container height="10%" paddingTop="0.5rem">
+                        {game.is_playing ? (
+                            <Text>In Progress</Text>
+                        ) : (
+                            <Text>Completed</Text>
+                        )}
+                    </Container>
                     <Container
                         display="flex"
                         alignItems="center"
                         flexDirection="column"
                         justifyContent="center"
+                        height="100%"
+                        width="100%"
+                        position="relative"
+                        bottom="0.8rem"
                     >
                         <Text>{getDisplayName(game, game.player_a_key)}</Text>
                         <Text

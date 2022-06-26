@@ -23,6 +23,11 @@ export default function GamePage() {
             .then((data) => {
                 setGame(data);
                 setLoading(false);
+            })
+            .catch((err) => {
+                if (err.status == 404) {
+                    router.push("/app");
+                }
             });
     };
     useEffect(() => {

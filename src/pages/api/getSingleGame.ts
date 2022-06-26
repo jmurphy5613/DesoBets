@@ -45,6 +45,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 ]
             }
         });
+        if (!game) {
+            res.status(404).json({
+                error: "Game not found"
+            });
+            return;
+        }
         res.status(200).json(game);
     }
     else {

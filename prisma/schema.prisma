@@ -18,4 +18,5 @@ model games {
   player_b_name   String?  @db.Text
   player_a_number String?  @db.Text
   player_b_number String?  @db.Text
+  bet             String?  @db.Text
 }

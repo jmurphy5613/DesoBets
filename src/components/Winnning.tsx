@@ -1,8 +1,26 @@
-import { Box, Heading, Input, Button } from "@chakra-ui/react";
+import {
+    Text,
+    Input,
+    Button,
+    useDisclosure,
+    Modal,
+    ModalOverlay,
+    ModalHeader,
+    ModalContent,
+    ModalCloseButton,
+    ModalBody,
+    ModalFooter,
+    Alert,
+    AlertIcon,
+    Stack,
+    Link,
+} from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import Deso from "deso-protocol";
 import ticTacToePreview from "../utils/TicTacToePreview";
 import { TicTacToeGameState, Game } from "../types";
+import { useReward } from "react-rewards";
+import NextLink from "next/link";
 
 type WinningProps = {
     gameState: TicTacToeGameState;
@@ -13,10 +31,14 @@ type WinningProps = {
 const Winning: React.FC<WinningProps> = ({ gameState, opponentName, game }) => {
     const [message, setMessage] = useState("");
     const [sentMessage, setSentMessage] = useState(false);
+    const { isOpen, onOpen, onClose } = useDisclosure({ defaultIsOpen: true });
+    const { reward, isAnimating } = useReward("game-win", "confetti", {
+        spread: 150,
+    });
 
     useEffect(() => {
-        if (game && game.winner) setSentMessage(false);
-        else setSentMessage(true);
+        if (game && game.winner) setSentMessage(true);
+        else setSentMessage(false);
     }, [game]);
 
     const sendWinningMessage = async () => {
@@ -43,28 +65,73 @@ const Winning: React.FC<WinningProps> = ({ gameState, opponentName, game }) => {
                     gameOver: true,
                 }),
             });
+            location.href = "http://localhost:3000/app";
         }
     };
 
+    useEffect(() => {
+        setTimeout(reward, 500);
+    }, []);
+
     return (
-        <Box
-            height="100vh"
-            width="100vw"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            bgColor="rgba(0, 0, 0, 0.7)"
-            position="absolute"
-            flexDirection="column"
-        >
-            <Heading color="white">Congrats you won!</Heading>
-            <Input
-                placeholder="Send a custom winning message!"
-                onChange={(e) => setMessage(e.target.value)}
-                width="30%"
+        <>
+            <span
+                id="game-win"
+                style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: "50%",
+                    zIndex: 1500,
+                }}
             />
-            <Button onClick={sendWinningMessage}>Submit</Button>
-        </Box>
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        Congratulations! You will recieve payment!
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Stack gap={2}>
+                            {!sentMessage && (
+                                <>
+                                    <Input
+                                        placeholder="Send a custom winning message!"
+                                        onChange={(e) =>
+                                            setMessage(e.target.value)
+                                        }
+                                    />
+                                    <Alert status="info" rounded="md">
+                                        <AlertIcon />
+                                        This will create an on-chain post that
+                                        is tied to your account permanently
+                                    </Alert>
+                                </>
+                            )}
+                            <Text>Wanna play another?</Text>
+                        </Stack>
+                    </ModalBody>
+                    <ModalFooter justifyContent="space-between">
+                        <Button onClick={onClose}>Close</Button>
+                        <Stack direction="row">
+                            <NextLink href="/app" passHref>
+                                <Button variant="outline" colorScheme="teal">
+                                    Play Another Game
+                                </Button>
+                            </NextLink>
+                            {!sentMessage && (
+                                <Button
+                                    onClick={sendWinningMessage}
+                                    colorScheme="teal"
+                                >
+                                    Submit
+                                </Button>
+                            )}
+                        </Stack>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </>
     );
 };
 

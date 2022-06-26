@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method == "POST") {
-        const { playerAKey, playerBKey, gameType, playerAName, playerBName, playerANumber } = req.body;
-        if (!playerAKey || !playerBKey || !gameType || !playerAName || !playerBName || !playerANumber) {
+        const { playerAKey, playerBKey, gameType, playerAName, playerBName, playerANumber, bet } = req.body;
+        if (!playerAKey || !playerBKey || !gameType || !playerAName || !playerBName || !playerANumber || !bet) {
             res.status(400).json({
                 error: "Missing required fields"
             });
@@ -35,7 +35,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 player_a_move: false,
                 player_a_name: playerAName,
                 player_b_name: playerBName,
-                player_a_number: playerANumber
+                player_a_number: playerANumber,
+                bet: bet,
             }
         })
         res.status(200).json(game);

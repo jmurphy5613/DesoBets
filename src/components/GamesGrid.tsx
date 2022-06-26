@@ -1,4 +1,4 @@
-import { Grid, Text, GridItem, Container } from "@chakra-ui/react";
+import { Grid, Text, GridItem, Container, Wrap, Box } from "@chakra-ui/react";
 import { Game } from "../types";
 import { useRouter } from "next/router";
 
@@ -34,28 +34,28 @@ const GamesGrid: React.FC<GamesGridProps> = ({ games }: { games: Game[] }) => {
     const router = useRouter();
 
     return (
-        <Grid
-            templateRows="repeat(2, 1fr)"
-            templateColumns="repeat(3, 1fr)"
-            gridGap="2rem"
-            width="90vw"
-            marginTop="2rem"
-            height="60vh"
-        >
+        <Wrap width="90vw" marginTop="2rem" spacing={4} paddingY="4">
             {games.map((game, i) => (
-                <GridItem
+                <Box
                     key={i}
-                    border="1px solid #3750A8"
+                    border="3px solid #2a3354"
                     borderRadius="1rem"
                     backgroundColor="rgb(40, 44, 68)"
                     display="flex"
                     flexDirection="column"
                     fontSize="1.2rem"
                     fontWeight="500"
+                    minWidth="300px"
+                    h="180px"
+                    cursor="pointer"
+                    transition="all 0.2s ease"
+                    marginY="4"
                     onClick={() => {
                         location.href = `http://localhost:3000/game/${game.id}`;
                     }}
-                    _hover={{ cursor: "pointer" }}
+                    _hover={{
+                        boxShadow: "6px 8px 45px -12px rgba(0,0,0,0.75)",
+                    }}
                 >
                     <Container height="10%" paddingTop="0.5rem">
                         {!game.winner ? (
@@ -84,9 +84,9 @@ const GamesGrid: React.FC<GamesGridProps> = ({ games }: { games: Game[] }) => {
                         </Text>
                         <Text>{getDisplayName(game, game.player_b_key)}</Text>
                     </Container>
-                </GridItem>
+                </Box>
             ))}
-        </Grid>
+        </Wrap>
     );
 };
 

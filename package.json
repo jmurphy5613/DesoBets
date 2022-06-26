@@ -19,6 +19,7 @@
         "next": "latest",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-rewards": "^2.0.4",
         "twilio": "^3.77.3"
     },
     "devDependencies": {

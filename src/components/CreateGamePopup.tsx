@@ -101,6 +101,7 @@ const CreateGamePopup = ({
                 playerAName,
                 playerBName: username,
                 playerANumber: playerANumber.PhoneNumber,
+                bet: desoAmount,
             }),
         })
             .then((res) => res.json())
@@ -111,7 +112,7 @@ const CreateGamePopup = ({
                         BodyObj: {
                             Body: `Hi @${username} I'm challenging you to a game of ${getGameName(
                                 game
-                            )}. ${message}
+                            )} for $DESO ${desoAmount}. ${message}
                             ${window.location.origin}/game/${data.id}`,
                             VideoURLs: [],
                             ImageURLs: [],
@@ -167,6 +168,7 @@ const CreateGamePopup = ({
                             precision={3}
                             step={0.001}
                             marginBottom="1rem"
+                            onChange={(num) => setDesoAmount(num)}
                         >
                             <NumberInputField />
                             <NumberInputStepper>

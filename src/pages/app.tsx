@@ -24,6 +24,7 @@ const App = () => {
     const router = useRouter();
 
     const [games, setGames] = useState<Game[]>(null);
+    const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
         //go through all game entries and find the ones that involve this wallet
@@ -58,6 +59,7 @@ const App = () => {
                 height="90vh"
                 width="100%"
                 paddingX={8}
+                paddingTop={4}
             >
                 <Heading>Welcome,</Heading>
                 <Text>
@@ -87,13 +89,35 @@ const App = () => {
                                                 color="teal.400"
                                                 fontSize="xl"
                                             >
-                                                Games
+                                                Games (
+                                                {
+                                                    games.filter(
+                                                        (game) => !game.winner
+                                                    ).length
+                                                }
+                                                )
                                             </Text>
                                             <AccordionIcon />
                                         </AccordionButton>
                                     </Heading>
                                     <AccordionPanel>
-                                        <Text>Click on a game to view it!</Text>
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            marginBottom="1rem"
+                                        >
+                                            <Button
+                                                onClick={() => {
+                                                    setRefresh(refresh + 1);
+                                                }}
+                                                marginRight="2rem"
+                                            >
+                                                Refresh
+                                            </Button>
+                                            <Text>
+                                                Click on a game to view it!
+                                            </Text>
+                                        </Box>
                                         <GamesGrid
                                             games={games.filter(
                                                 (game) => !game.winner
@@ -109,7 +133,13 @@ const App = () => {
                                                 color="gray.400"
                                                 fontSize="xl"
                                             >
-                                                Completed
+                                                Completed (
+                                                {
+                                                    games.filter(
+                                                        (game) => game.winner
+                                                    ).length
+                                                }
+                                                )
                                             </Text>
                                             <AccordionIcon />
                                         </AccordionButton>

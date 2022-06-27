@@ -1,5 +1,5 @@
 # Deso Bets
-
+Somehow won 2 awards???
 ### What Is Deso Bets?
 
 Deso Bets is a project for the [Hack3 Hackathon](https://hack3.co/), and is a decentralized betting system that allows users to bet over simple games such as TicTacToe.
